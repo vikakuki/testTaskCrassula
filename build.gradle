@@ -20,8 +20,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.testcontainers:junit-jupiter'
+	testImplementation 'org.junit.jupiter:junit-jupiter-api'
 }
+
 dependencies {
 	implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.1.2'
 }
