@@ -1,31 +1,22 @@
 package la.crassula.test;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.util.concurrent.TimeUnit;
-
-class TestApplicationTests {
+public class PaymentTests {
 
     public WebDriver driver;
 
     @BeforeEach
     public void init() {
-        System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver/chromedriver.exe");
-        driver = new ChromeDriver();
-        driver.manage().window().maximize();
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
-
-        driver.get("https://client.demo.crassu.la/");
+        BrowserSetting bs = new BrowserSetting();
+        driver = bs.BrowserSettings();
 
         WebElement username = driver.findElement(By.id("mat-input-0"));
         WebElement password = driver.findElement(By.id("mat-input-1"));
@@ -42,14 +33,6 @@ class TestApplicationTests {
     @AfterEach
     public void quit() {
         driver.quit();
-    }
-
-    @Test
-    void login() {
-        String expectedUrl = "https://client.demo.crassu.la/dashboard";
-        String actualUrl = driver.getCurrentUrl();
-
-        Assertions.assertEquals(expectedUrl, actualUrl);
     }
 
     @Test
@@ -79,5 +62,4 @@ class TestApplicationTests {
 
         driver.findElement(By.xpath("//button[contains(., 'Confirm') and not(@disabled)]")).click();
     }
-
 }
