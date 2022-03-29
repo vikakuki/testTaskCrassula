@@ -8,4 +8,6 @@ public class WebDriverSettings {
         System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver/chromedriver.exe");
         return new ChromeDriver();
     }
+
+
 }
