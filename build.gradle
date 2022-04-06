@@ -12,17 +12,11 @@ repositories {
 	mavenCentral()
 }
 
-ext {
-	cucumberVersion = '7.2.3'
-}
-
-
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.1.2'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'io.cucumber:cucumber-java:7.2.3'
 	testImplementation 'org.junit.jupiter:junit-jupiter-api'
 	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }
@@ -35,15 +29,4 @@ configurations {
 
 test {
 	useJUnitPlatform()
-}
-
-task cucumber() {
-	dependsOn assemble, compileTestJava
-	doLast {
-		javaexec {
-			main = "io.cucumber.core.cli.Main"
-			classpath = configurations.cucumberRuntime + sourceSets.main.output + sourceSets.test.output
-			args = ['--plugin', 'html:reports/test-report' ,'--plugin', 'pretty', '--glue', 'gradle.cucumber', 'src/test/resources']
-		}
-	}
 }
