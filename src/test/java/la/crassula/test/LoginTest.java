@@ -1,108 +1,91 @@
 package la.crassula.test;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
-import static la.crassula.test.BrowserSetting.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class LoginTest {
+class LoginTest extends BaseSteps {
 
-    private WebDriver webDriver;
-    private WebElement usernameInput;
-    private WebElement passwordInput;
-    private WebElement loginBtn;
+    private final WebElement usernameInput;
+    private final WebElement passwordInput;
+    private final WebElement loginBtn;
+    private final String baseUrl = properties.getProperty("baseURL");
 
-    @BeforeEach
-    public void init() {
-        BrowserSetting bs = new BrowserSetting();
-        webDriver = bs.BrowserSettings();
-
-        usernameInput = webDriver.findElement(By.id("mat-input-0"));
-        passwordInput = webDriver.findElement(By.id("mat-input-1"));
-        loginBtn = webDriver.findElement(By.className("btn"));
-    }
-
-    @AfterEach
-    public void quit() {
-       webDriver.quit();
+    public LoginTest() {
+        usernameInput = findElementById("mat-input-0");
+        passwordInput = findElementById("mat-input-1");
+        loginBtn = findElementByClass("btn");
     }
 
     @Test
-    void testSuccessfulLogin() {
-        usernameInput.sendKeys(rightUsername);
-        passwordInput.sendKeys(rightPassword);
+    void testThatCantLoginWithoutUsernameAndSeeError() {
+        usernameInput.sendKeys("");
+        passwordInput.sendKeys(properties.getProperty("rightPassword"));
         loginBtn.click();
 
-        WebDriverWait wait = new WebDriverWait(webDriver, 15);
-        wait.until(ExpectedConditions.titleContains("Dashboard"));
+        String errorText = findElementByPath("//mat-error[contains(., 'The value should not be blank.')]").getText();
+        String expectedErrorText = "The value should not be blank.";
 
-        String expectedUrl = "https://client.demo.crassu.la/dashboard";
+        assertEquals(expectedErrorText, errorText,"Should show error - The value should not be blank.");
+    }
+
+    @Test
+    void testThatCantLoginWithoutPasswordAndSeeError() {
+        usernameInput.sendKeys(properties.getProperty("rightUsername"));
+        passwordInput.sendKeys("");
+        loginBtn.click();
+
+        String errorText = findElementByPath("//mat-error[contains(., 'The value should not be blank.')]").getText();
+        String expectedErrorText = "The value should not be blank.";
+
+        assertEquals(expectedErrorText, errorText,"Should show error - The value should not be blank.");
+    }
+
+    @Test
+    void testThatCantLoginWithoutDataAndSeeError() {
+        usernameInput.sendKeys("");
+        passwordInput.sendKeys("");
+
+        loginBtn.click();
+
+        String errorText = findElementByPath("//mat-error[contains(., 'The value should not be blank.')]").getText();
+        String expectedErrorText = "The value should not be blank.";
+
+        assertEquals(expectedErrorText, errorText, "Should show error - The value should not be blank.");
+    }
+
+    @Test
+    void testThatCantLoginWithWrongPassAndSeeError() {
+        usernameInput.sendKeys(properties.getProperty("rightUsername"));
+        passwordInput.sendKeys(properties.getProperty("wrongPassword"));
+        loginBtn.click();
+
+        boolean isErrorDisplayed =findElementByPath("//span[.='Invalid credentials.']").isDisplayed();
+
+        assertTrue(isErrorDisplayed, "Didn't show error message, Should write - Invalid credentials");
+    }
+
+    @Test
+    void testThatCantLoginWithWrongUsernameAndSeeError() {
+        usernameInput.sendKeys(properties.getProperty("wrongUsername"));
+        passwordInput.sendKeys(properties.getProperty("rightPassword"));
+        loginBtn.click();
+
+        boolean isErrorDisplayed = findElementByPath("//span[.='Invalid credentials.']").isDisplayed();
+
+        assertTrue(isErrorDisplayed, "Didn't show error message, Should write - Invalid credentials");
+    }
+
+    @Test
+    void testSuccessfulLoginAndMoveToDashboard() {
+        login();
+
+        String expectedUrl = baseUrl + "dashboard";
         String actualUrl = webDriver.getCurrentUrl();
 
-        assertEquals(expectedUrl, actualUrl,"Should login, something went wrong");
+        assertEquals(expectedUrl, actualUrl,"Actual and expected links are different, didn't login");
+        logout();
     }
-
-    @Test
-    void testLoginWithoutUsernameFail() {
-        usernameInput.sendKeys(emptyLine);
-        passwordInput.sendKeys(rightPassword);
-        loginBtn.click();
-
-        boolean isErrorDisplayed = webDriver.findElement(By.id("mat-error-1")).isDisplayed();
-
-        assertTrue(isErrorDisplayed, "Should write about blank username");
-    }
-
-    @Test
-    void testLoginWithoutPassFail() {
-        usernameInput.sendKeys(rightUsername);
-        passwordInput.sendKeys(emptyLine);
-        loginBtn.click();
-
-        boolean isErrorDisplayed = webDriver.findElement(By.id("mat-error-1")).isDisplayed();
-
-        assertTrue(isErrorDisplayed, "Should write about blank password");
-    }
-
-    @Test
-    void testLoginWithoutDataFail() {
-        usernameInput.sendKeys(emptyLine);
-        passwordInput.sendKeys(emptyLine);
-        loginBtn.click();
-
-        boolean isErrorDisplayed = webDriver.findElement(By.id("mat-error-1")).isDisplayed();
-
-        assertTrue(isErrorDisplayed, "Should write about blank username and password");
-    }
-
-    @Test
-    void testLoginWithWrongPassFail() {
-        usernameInput.sendKeys(rightUsername);
-        passwordInput.sendKeys(wrongPassword);
-        loginBtn.click();
-
-        boolean isErrorDisplayed = webDriver.findElement(By.xpath("//span[.='Invalid credentials.']")).isDisplayed();
-
-        assertTrue(isErrorDisplayed, "Should write - Invalid credentials");
-    }
-
-    @Test
-    void testLoginWithWrongUsernameFail() {
-        usernameInput.sendKeys(wrongUsername);
-        passwordInput.sendKeys(rightPassword);
-        loginBtn.click();
-
-        boolean isErrorDisplayed = webDriver.findElement(By.xpath("//span[.='Invalid credentials.']")).isDisplayed();
-
-        assertTrue(isErrorDisplayed, "Should write - Invalid credentials");
-    }
-
 }
